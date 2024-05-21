@@ -4,7 +4,6 @@ import { PrismaService } from '../services/prisma-service';
 export const AccountController = {
   async createAccount(req: Request, res: Response) {
     try {
-      console.log(req.body);
       if (!req.body.data) {
         res.status(500).json({ message: 'User data is required' });
       }
