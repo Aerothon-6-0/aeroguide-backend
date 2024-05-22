@@ -6,15 +6,130 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URI")
+  extensions = [postgis]
 }
 
 model Account {
   id    Int    @id @default(autoincrement())
   email String @unique
   name  String
+
+  flights Flight[]  
 }
+
+model Airline {
+  id        Int      @id @default(autoincrement())
+  name      String
+  country   String
+  IATA_code String
+  ICAO_code String
+
+  Aircrafts Aircraft[]
+}
+
+model Aircraft {
+  id              Int       @id @default(autoincrement())
+  model           String
+  manufacturer    String
+  capacity        Int
+  airlineId       Int
+  healthMetrics   Json
+  lastMaintenance DateTime
+
+  airline Airline @relation(fields: [airlineId], references: [id])
+  Flights Flight[]
+}
+
+model Airport {
+  code      String  @id
+  name      String
+  city      String
+  country   String
+  location  Unsupported("geography(Point, 4326)")
+  elevation Int
+
+  Flights_origin      Flight[] @relation("FlightsOrigin")
+  Flights_destination Flight[] @relation("FlightsDestination")
+}
+
+model Flight {
+  id                Int       @id @default(autoincrement())
+  aircraftId        Int
+  userId            Int
+  originCode        String
+  destinationCode   String
+  scheduledDeparture DateTime
+  scheduledArrival  DateTime
+  actualDeparture   DateTime?
+  actualArrival     DateTime?
+  status            String
+  currLocation      Unsupported("geography(Point, 4326)")
+  altitude          Float?
+  plannedRoute      Unsupported("geography(Point, 4326)")
+  currentRoute      Unsupported("geography(Point, 4326)")
+  riskAssessment    RiskAssessment?
+  lastUpdated       DateTime
+
+  aircraft          Aircraft @relation(fields: [aircraftId], references: [id])
+  origin            Airport  @relation("FlightsOrigin", fields: [originCode], references: [code])
+  destination       Airport  @relation("FlightsDestination", fields: [destinationCode], references: [code])
+  account           Account  @relation(fields:[userId], references: [id])
+  Notifications     Notification[]
+}
+
+model WeatherCondition {
+  id            Int      @id @default(autoincrement())
+  timestamp     DateTime
+  location      Unsupported("geography(Point, 4326)")
+  temperature   Float
+  windSpeed     Float
+  windDirection Float
+  humidity      Float
+  visibility    Float
+  condition     String
+
+  RiskAssessments RiskAssessment[]
+}
+
+model RiskAssessment {
+  id                Int      @id @default(autoincrement())
+  flightId          Int      @unique
+  timestamp         DateTime
+  weatherConditionId Int
+  electronicFailure Boolean
+  visibilityIssue   Boolean
+  otherRisks        String
+  riskLevel         String
+  suggestedAction   String
+
+  flight Flight @relation(fields: [flightId], references: [id])
+  weatherCondition WeatherCondition @relation(fields: [weatherConditionId], references: [id])
+}
+
+model SystemLog {
+  id         Int      @id @default(autoincrement())
+  timestamp  DateTime
+  systemEvent String
+  eventType  String
+  details    String
+  tsvDetails String?
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  flightId    Int
+  timestamp   DateTime
+  message     String
+  severity    String
+  acknowledged Boolean
+
+  flight Flight @relation(fields: [flightId], references: [id])
+}
+
