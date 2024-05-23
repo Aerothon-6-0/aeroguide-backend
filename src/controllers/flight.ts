@@ -46,6 +46,7 @@ export const FlightController = {
       const optimalRoute: any =
         await AeroguideService.getOptimalRoute(modifiedMatrix);
 
+        
       res.status(200).json(optimalRoute);
     } catch (error) {
       console.error(error);
