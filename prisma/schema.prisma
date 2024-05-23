@@ -16,21 +16,19 @@ datasource db {
 }
 
 model Account {
-  id    Int    @id @default(autoincrement())
-  email String @unique
-  name  String
-
+  id      Int      @id @default(autoincrement())
+  email   String   @unique
+  name    String
   flights Flight[]
 }
 
 model Airline {
-  id        Int    @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   name      String
   country   String
   IATA_code String
   ICAO_code String
-
-  Aircrafts Aircraft[]
+  aircrafts Aircraft[] // Corrected naming convention
 }
 
 model Aircraft {
@@ -43,59 +41,60 @@ model Aircraft {
   lastMaintenance DateTime
 
   airline Airline  @relation(fields: [airlineId], references: [id])
-  Flights Flight[]
+  flights Flight[]
 }
 
 model Airport {
-  code      String                                @id
-  name      String
-  city      String
-  country   String
-  location  Unsupported("geography(Point, 4326)")
-  elevation Int
-
-  Flights_origin      Flight[] @relation("FlightsOrigin")
-  Flights_destination Flight[] @relation("FlightsDestination")
+  code               String   @id
+  name               String
+  city               String
+  country            String
+  location           Float[] // Use a supported type for geographical Float[]s
+  elevation          Int
+  flightsOrigin      Flight[] @relation("FlightsOrigin")
+  flightsDestination Flight[] @relation("FlightsDestination")
 }
 
 model Flight {
-  id                 Int                                   @id @default(autoincrement())
+  id                 Int                                     @id @default(autoincrement())
   aircraftId         Int
   userId             Int
   originCode         String
-  bounds             Json?                                 @db.JsonB
   destinationCode    String
   scheduledDeparture DateTime
   scheduledArrival   DateTime
   actualDeparture    DateTime?
   actualArrival      DateTime?
   status             String
-  currLocation       Unsupported("geography(Point, 4326)")
+  currLocation       Float[] // Use a supported type for geographical Float[]s
   altitude           Float?
-  plannedRoute       Unsupported("geography(Point, 4326)")
-  currentRoute       Unsupported("geography(Point, 4326)")
+  plannedRoute       Unsupported("geography(Point, 4326)")[] // Use a supported type for geographical Float[]s
+  currentRoute       Unsupported("geography(Point, 4326)")[] // Use a supported type for geographical Float[]s
   riskAssessment     RiskAssessment?
   lastUpdated        DateTime
 
-  aircraft      Aircraft       @relation(fields: [aircraftId], references: [id])
-  origin        Airport        @relation("FlightsOrigin", fields: [originCode], references: [code])
-  destination   Airport        @relation("FlightsDestination", fields: [destinationCode], references: [code])
-  account       Account        @relation(fields: [userId], references: [id])
-  Notifications Notification[]
+  aircraft         Aircraft           @relation(fields: [aircraftId], references: [id])
+  origin           Airport            @relation("FlightsOrigin", fields: [originCode], references: [code])
+  destination      Airport            @relation("FlightsDestination", fields: [destinationCode], references: [code])
+  account          Account            @relation(fields: [userId], references: [id])
+  notifications    Notification[]
+  WeatherCondition WeatherCondition[]
 }
 
 model WeatherCondition {
-  id            Int                                   @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   timestamp     DateTime
-  location      Unsupported("geography(Point, 4326)")
+  location      Float[] // Use a supported type for geographical Float[]s
   temperature   Float
   windSpeed     Float
   windDirection Float
   humidity      Float
   visibility    Float
   condition     String
+  Flight        Flight   @relation(fields: [flightId], references: [id])
 
-  RiskAssessments RiskAssessment[]
+  riskAssessments RiskAssessment[]
+  flightId        Int
 }
 
 model RiskAssessment {
@@ -105,7 +104,7 @@ model RiskAssessment {
   weatherConditionId Int
   electronicFailure  Boolean
   visibilityIssue    Boolean
-  otherRisks         String
+  otherRisks         Json?    @db.JsonB
   riskLevel          String
   suggestedAction    String
 

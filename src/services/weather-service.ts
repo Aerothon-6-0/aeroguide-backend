@@ -52,58 +52,67 @@ export const WeatherService = {
     ];
     params['forecast_days'] = 1;
 
-    const responses: any = await fetchWeatherApi(weather_url, params);
+    try {
+      const responses: any = await fetchWeatherApi(weather_url, params);
 
-    if (responses.length === 0) {
-      throw new Error('No weather data found');
+      if (responses.length === 0) {
+        throw new Error('No weather data found');
+      }
+
+      // Helper function to form time ranges
+      const range = (start: number, stop: number, step: number) =>
+        Array.from(
+          { length: (stop - start) / step },
+          (_, i) => start + i * step,
+        );
+
+      const weatherDataArray = responses.map((response: any) => {
+        const utcOffsetSeconds = response.utcOffsetSeconds();
+        const lat = response.latitude();
+        const long = response.longitude();
+        const hourly = response.hourly()!;
+
+        const weatherData = {
+          hourlyData: {
+            time: range(
+              Number(hourly?.time()),
+              Number(hourly?.timeEnd()),
+              hourly?.interval(),
+            ).map((t) => new Date((t + utcOffsetSeconds) * 1000)),
+            rain: hourly?.variables(0)!.valuesArray()!,
+            snowfall: hourly?.variables(1)!.valuesArray()!,
+            weatherCode: hourly?.variables(2)!.valuesArray()!,
+            cloudCover: hourly?.variables(3)!.valuesArray()!,
+            windSpeed180m: hourly?.variables(4)!.valuesArray()!,
+            windDirection180m: hourly?.variables(5)!.valuesArray()!,
+          },
+        };
+
+        const formattedHourlyData = weatherData.hourlyData.time.map(
+          (timestamp: any, index: number) => ({
+            time: timestamp, // Convert Unix timestamp to Date
+            rain: weatherData.hourlyData.rain[index],
+            snowfall: weatherData.hourlyData.snowfall[index],
+            weatherCode: weatherData.hourlyData.weatherCode[index],
+            cloudCover: weatherData.hourlyData.cloudCover[index],
+            windSpeed180m: weatherData.hourlyData.windSpeed180m[index],
+            windDirection180m: weatherData.hourlyData.windDirection180m[index],
+          }),
+        );
+
+        return [
+          {
+            lat,
+            long,
+            formattedHourlyData,
+          },
+        ];
+      });
+      return [...weatherDataArray];
+    } catch (error) {
+      console.error(error);
+      // throw new Error(`${error}`);
     }
-
-    // Helper function to form time ranges
-    const range = (start: number, stop: number, step: number) =>
-      Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
-
-    const weatherDataArray = responses.map((response: any) => {
-      const utcOffsetSeconds = response.utcOffsetSeconds();
-      const latitude = response.latitude();
-      const longitude = response.longitude();
-      const hourly = response.hourly()!;
-      const weatherData = {
-        hourlyData: {
-          time: range(
-            Number(hourly?.time()),
-            Number(hourly?.timeEnd()),
-            hourly?.interval(),
-          ).map((t) => new Date((t + utcOffsetSeconds) * 1000)),
-          rain: hourly?.variables(0)!.valuesArray()!,
-          snowfall: hourly?.variables(1)!.valuesArray()!,
-          weatherCode: hourly?.variables(2)!.valuesArray()!,
-          cloudCover: hourly?.variables(3)!.valuesArray()!,
-          windSpeed180m: hourly?.variables(4)!.valuesArray()!,
-          windDirection180m: hourly?.variables(5)!.valuesArray()!,
-        },
-      };
-
-      const formattedHourlyData = weatherData.hourlyData.time.map(
-        (timestamp: any, index: number) => ({
-          time: timestamp, // Convert Unix timestamp to Date
-          rain: weatherData.hourlyData.rain[index],
-          snowfall: weatherData.hourlyData.snowfall[index],
-          weatherCode: weatherData.hourlyData.weatherCode[index],
-          cloudCover: weatherData.hourlyData.cloudCover[index],
-          windSpeed180m: weatherData.hourlyData.windSpeed180m[index],
-          windDirection180m: weatherData.hourlyData.windDirection180m[index],
-        }),
-      );
-
-      return [
-        {
-          latitude,
-          longitude,
-          formattedHourlyData,
-        },
-      ];
-    });
-    return [...weatherDataArray];
   },
 
   async generateLatLong(bounds: Bounds) {
@@ -114,7 +123,7 @@ export const WeatherService = {
     // the distance between any node has to be 5km
     // each node should have a lat and long
 
-    const distance = 200; // 60km
+    const distance = 75; // 60km
 
     const latlongMatrix = generateMatrix(bounds, distance);
 

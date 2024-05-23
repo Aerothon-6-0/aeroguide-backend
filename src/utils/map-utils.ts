@@ -16,6 +16,7 @@ export const changeInLongitude = (distance: number, latitude: number) => {
 export const generateMatrix = (bounds: Bounds, distance: number) => {
   const { north_east, south_west, north_west, south_east } = bounds;
   const latStep = changeInLatitude(distance);
+
   const latLongMatrix = [];
   // Iterate from south to north
   for (let lat = south_west.lat; lat <= north_west.lat; lat += latStep) {
