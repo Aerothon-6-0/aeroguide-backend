@@ -33,6 +33,5 @@ export const generateMatrix = (bounds: Bounds, distance: number) => {
     latLongMatrix.push(row);
   }
 
-
   return latLongMatrix;
 };

@@ -12,6 +12,6 @@ router.get('/', (req: Request, res: Response) => {
 
 router.use('/accounts', accounts);
 router.use('/flightRoute', flightRoute);
-router.use('/weather',weather)
+router.use('/weather', weather);
 
 export default router;
