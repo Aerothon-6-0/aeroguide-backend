@@ -13,7 +13,7 @@ export const AccountController = {
       const email = email_addresses[0].email_address;
       const name = `${first_name} ${last_name}`;
 
-      const account = await PrismaService.createAccount(email, name);
+      const account = PrismaService.createAccount(email, name);
 
       if (!account) {
         res.status(500).json({ message: 'Account not created' });

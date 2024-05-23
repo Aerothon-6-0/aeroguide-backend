@@ -5,14 +5,13 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
-
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URI")
+  provider   = "postgresql"
+  url        = env("DATABASE_URI")
   extensions = [postgis]
 }
 
@@ -21,11 +20,11 @@ model Account {
   email String @unique
   name  String
 
-  flights Flight[]  
+  flights Flight[]
 }
 
 model Airline {
-  id        Int      @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   name      String
   country   String
   IATA_code String
@@ -35,7 +34,7 @@ model Airline {
 }
 
 model Aircraft {
-  id              Int       @id @default(autoincrement())
+  id              Int      @id @default(autoincrement())
   model           String
   manufacturer    String
   capacity        Int
@@ -43,12 +42,12 @@ model Aircraft {
   healthMetrics   Json
   lastMaintenance DateTime
 
-  airline Airline @relation(fields: [airlineId], references: [id])
+  airline Airline  @relation(fields: [airlineId], references: [id])
   Flights Flight[]
 }
 
 model Airport {
-  code      String  @id
+  code      String                                @id
   name      String
   city      String
   country   String
@@ -60,32 +59,33 @@ model Airport {
 }
 
 model Flight {
-  id                Int       @id @default(autoincrement())
-  aircraftId        Int
-  userId            Int
-  originCode        String
-  destinationCode   String
+  id                 Int                                   @id @default(autoincrement())
+  aircraftId         Int
+  userId             Int
+  originCode         String
+  bounds             Json?                                 @db.JsonB
+  destinationCode    String
   scheduledDeparture DateTime
-  scheduledArrival  DateTime
-  actualDeparture   DateTime?
-  actualArrival     DateTime?
-  status            String
-  currLocation      Unsupported("geography(Point, 4326)")
-  altitude          Float?
-  plannedRoute      Unsupported("geography(Point, 4326)")
-  currentRoute      Unsupported("geography(Point, 4326)")
-  riskAssessment    RiskAssessment?
-  lastUpdated       DateTime
+  scheduledArrival   DateTime
+  actualDeparture    DateTime?
+  actualArrival      DateTime?
+  status             String
+  currLocation       Unsupported("geography(Point, 4326)")
+  altitude           Float?
+  plannedRoute       Unsupported("geography(Point, 4326)")
+  currentRoute       Unsupported("geography(Point, 4326)")
+  riskAssessment     RiskAssessment?
+  lastUpdated        DateTime
 
-  aircraft          Aircraft @relation(fields: [aircraftId], references: [id])
-  origin            Airport  @relation("FlightsOrigin", fields: [originCode], references: [code])
-  destination       Airport  @relation("FlightsDestination", fields: [destinationCode], references: [code])
-  account           Account  @relation(fields:[userId], references: [id])
-  Notifications     Notification[]
+  aircraft      Aircraft       @relation(fields: [aircraftId], references: [id])
+  origin        Airport        @relation("FlightsOrigin", fields: [originCode], references: [code])
+  destination   Airport        @relation("FlightsDestination", fields: [destinationCode], references: [code])
+  account       Account        @relation(fields: [userId], references: [id])
+  Notifications Notification[]
 }
 
 model WeatherCondition {
-  id            Int      @id @default(autoincrement())
+  id            Int                                   @id @default(autoincrement())
   timestamp     DateTime
   location      Unsupported("geography(Point, 4326)")
   temperature   Float
@@ -99,37 +99,36 @@ model WeatherCondition {
 }
 
 model RiskAssessment {
-  id                Int      @id @default(autoincrement())
-  flightId          Int      @unique
-  timestamp         DateTime
+  id                 Int      @id @default(autoincrement())
+  flightId           Int      @unique
+  timestamp          DateTime
   weatherConditionId Int
-  electronicFailure Boolean
-  visibilityIssue   Boolean
-  otherRisks        String
-  riskLevel         String
-  suggestedAction   String
+  electronicFailure  Boolean
+  visibilityIssue    Boolean
+  otherRisks         String
+  riskLevel          String
+  suggestedAction    String
 
-  flight Flight @relation(fields: [flightId], references: [id])
+  flight           Flight           @relation(fields: [flightId], references: [id])
   weatherCondition WeatherCondition @relation(fields: [weatherConditionId], references: [id])
 }
 
 model SystemLog {
-  id         Int      @id @default(autoincrement())
-  timestamp  DateTime
+  id          Int      @id @default(autoincrement())
+  timestamp   DateTime
   systemEvent String
-  eventType  String
-  details    String
-  tsvDetails String?
+  eventType   String
+  details     String
+  tsvDetails  String?
 }
 
 model Notification {
-  id          Int      @id @default(autoincrement())
-  flightId    Int
-  timestamp   DateTime
-  message     String
-  severity    String
+  id           Int      @id @default(autoincrement())
+  flightId     Int
+  timestamp    DateTime
+  message      String
+  severity     String
   acknowledged Boolean
 
   flight Flight @relation(fields: [flightId], references: [id])
 }
-

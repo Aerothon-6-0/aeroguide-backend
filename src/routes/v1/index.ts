@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { Request, Response } from 'express';
 import accounts from './accounts';
-import flightRoute from './flightRoute';
+import flightRoute from './flight';
 import weather from './weather';
 
 const router = Router();

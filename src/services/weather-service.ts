@@ -11,16 +11,8 @@ const weather_url = 'https://api.open-meteo.com/v1/forecast';
 export const WeatherService = {
   async getWeatherByLatLong(lat: number, long: number) {
     let params: any = {};
-    params['lat'] = lat;
-    params['lon'] = long;
-    params['current'] = [
-      'rain',
-      'snowfall',
-      'weather_code',
-      'cloud_cover',
-      'wind_speed_10m',
-      'wind_direction_10m',
-    ];
+    params['latitude'] = lat;
+    params['longitude'] = long;
     params['hourly'] = [
       'rain',
       'snowfall',
@@ -30,6 +22,7 @@ export const WeatherService = {
       'wind_speed_180m',
       'wind_direction_180m',
     ];
+    params['forecast_days'] = 1;
 
     const response: any = await fetchWeatherApi(weather_url, params);
 
@@ -64,8 +57,6 @@ export const WeatherService = {
     if (responses.length === 0) {
       throw new Error('No weather data found');
     }
-
-
 
     // Helper function to form time ranges
     const range = (start: number, stop: number, step: number) =>

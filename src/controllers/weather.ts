@@ -22,6 +22,9 @@ export const WeatherController = {
   async getBulkWeatherByLatLong(req: Request, res: Response) {
     try {
       const bounds: Bounds = req.body.bounds;
+
+      //save the bounds in flight table
+
       if (!bounds) {
         return res.status(500).json({ message: 'Bounds are required' });
       }
