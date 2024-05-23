@@ -43,7 +43,7 @@ export const WeatherService = {
     params['longitude'] = [...long];
     params['hourly'] = [
       'rain',
-      'snowfall',
+      'visibility',
       'weather_code',
       'cloud_cover',
       'visibility',
@@ -80,7 +80,7 @@ export const WeatherService = {
               hourly?.interval(),
             ).map((t) => new Date((t + utcOffsetSeconds) * 1000)),
             rain: hourly?.variables(0)!.valuesArray()!,
-            snowfall: hourly?.variables(1)!.valuesArray()!,
+            visibility: hourly?.variables(1)!.valuesArray()!,
             weatherCode: hourly?.variables(2)!.valuesArray()!,
             cloudCover: hourly?.variables(3)!.valuesArray()!,
             windSpeed180m: hourly?.variables(4)!.valuesArray()!,
@@ -92,7 +92,7 @@ export const WeatherService = {
           (timestamp: any, index: number) => ({
             time: timestamp, // Convert Unix timestamp to Date
             rain: weatherData.hourlyData.rain[index],
-            snowfall: weatherData.hourlyData.snowfall[index],
+            visibility: weatherData.hourlyData.visibility[index],
             weatherCode: weatherData.hourlyData.weatherCode[index],
             cloudCover: weatherData.hourlyData.cloudCover[index],
             windSpeed180m: weatherData.hourlyData.windSpeed180m[index],

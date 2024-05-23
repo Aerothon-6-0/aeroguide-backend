@@ -66,6 +66,10 @@ export const PrismaService = {
   async getFlightById(id: number) {
     return prisma.flight.findUnique({
       where: { id },
+      include:{
+       origin:true,
+        destination:true,
+      }
     });
   },
 

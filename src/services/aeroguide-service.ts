@@ -1,4 +1,4 @@
-const aeroguideBaseUrl = 'https://aeroguide-algorithm-1.onrender.com/';
+const aeroguideBaseUrl = 'https://7953-106-206-21-4.ngrok-free.app/';
 import axios from 'axios';
 
 export const AeroguideService = {

@@ -3,6 +3,7 @@ import { Bounds } from '../interfaces/map-interface';
 import { WeatherService } from '../services/weather-service';
 import { MapMatrixTransformer } from '../transformers/map-transformer';
 import { AeroguideService } from '../services/aeroguide-service';
+import { PrismaService } from '../services/prisma-service';
 
 export const FlightController = {
   async createFlight(req: Request, res: Response) {
@@ -17,6 +18,9 @@ export const FlightController = {
       if (!flightId) {
         res.status(400).json({ message: 'Flight id is required' });
       }
+
+      const flight = await PrismaService.getFlightById(parseInt(flightId));
+
       const {
         bounds,
         source,
@@ -37,8 +41,8 @@ export const FlightController = {
 
       const modifiedMatrix = MapMatrixTransformer(
         weatherInfo,
-        source,
-        destination,
+        flight?.origin.location,
+        flight?.destination.location,
       );
 
       const optimalRoute: any =
