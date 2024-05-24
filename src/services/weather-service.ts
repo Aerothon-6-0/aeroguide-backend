@@ -6,30 +6,44 @@ import {
 } from '../utils/map-utils';
 import { Bounds } from '../interfaces/map-interface';
 
+
 const weather_url = 'https://api.open-meteo.com/v1/forecast';
 
 export const WeatherService = {
   async getWeatherByLatLong(lat: number, long: number) {
+   try {
+    console.log(lat,long)
     let params: any = {};
     params['latitude'] = lat;
     params['longitude'] = long;
-    params['hourly'] = [
-      'rain',
-      'snowfall',
-      'weather_code',
-      'cloud_cover',
-      'visibility',
-      'wind_speed_180m',
-      'wind_direction_180m',
-    ];
-    params['forecast_days'] = 1;
+    params['current'] =["temperature_2m", "rain", "weather_code", "cloud_cover", "wind_speed_10m", "wind_direction_10m"]
 
-    const response: any = await fetchWeatherApi(weather_url, params);
 
-    if (!response) {
+    const responses: any = await fetchWeatherApi(weather_url, params);
+
+    if (!responses) {
       throw new Error('No weather data found');
     }
-    return response.data;
+
+    const response = responses[0]
+    const current = response.current()!;
+   const weatherData ={
+    current: {
+      temperature2m: current.variables(0)!.value(),
+      rain: current.variables(1)!.value(),
+      weatherCode: current.variables(2)!.value(),
+      cloudCover: current.variables(3)!.value(),
+      windSpeed10m: current.variables(4)!.value(),
+      windDirection10m: current.variables(5)!.value(),
+    },
+   }
+   console.log(weatherData)
+    return weatherData;
+
+   } catch (error) {
+console.error(error)    
+throw new Error(`${error}`);
+   }
   },
 
   async getBulkWeatherByLatLong(lat: number[], long: number[]) {

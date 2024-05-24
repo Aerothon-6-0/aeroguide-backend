@@ -12,7 +12,7 @@ export const FlightController = {
     }
   },
 
-  async getFlight(req: Request, res: Response) {
+  async getFlightRoute(req: Request, res: Response) {
     try {
       const flightId = req.params.id;
       if (!flightId) {
@@ -69,6 +69,25 @@ export const FlightController = {
       console.error(e);
     }
   },
+  async getFlightById (req: Request, res: Response) {
+    try {
+      const flightId = req.params.id;
+      if (!flightId) {
+        res.status(400).json({ message: 'Flight id is required' });
+      }
+      const flight = await PrismaService.getFlightById(parseInt(flightId));
+
+      if(!flight?.origin){
+        return res.status(404).json({message: "Flight info not found"});
+      }
+console.log(flight?.origin.location[0],flight?.origin.location[1])
+      const weatherInfo = await WeatherService.getWeatherByLatLong(flight?.origin.location[0],flight?.origin.location[1]);
+      console.log(weatherInfo)
+      res.status(200).json({flight,weatherInfo});
+    } catch (error) {
+      
+    }
+  }
 
   // async getFlightPlannedRoute(req:Request,res:Response){
   //   try{
