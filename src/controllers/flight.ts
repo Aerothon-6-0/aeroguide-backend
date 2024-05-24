@@ -47,10 +47,12 @@ export const FlightController = {
         flight?.destination.location,
       );
 
-      // const optimalRoute: any =
-      //   await AeroguideService.getOptimalRoute(modifiedMatrix);
+      const optimalRoute: any =
+        await AeroguideService.getOptimalRoute(modifiedMatrix);
 
-      res.status(200).json(modifiedMatrix);
+
+
+      res.status(200).json(optimalRoute);
     } catch (error) {
       console.error(error);
     }
@@ -66,6 +68,22 @@ export const FlightController = {
     catch(e){
       console.error(e);
     }
-  }
+  },
+
+  // async getFlightPlannedRoute(req:Request,res:Response){
+  //   try{
+  //     const flightId = req.params.id;
+  //     if (!flightId) {
+  //       res.status(400).json({ message: 'Flight id is required' });
+  //     }
+
+  //     const flight = await PrismaService.getFlightById(parseInt(flightId));
+
+  //     res.json(flight.plannedRoute)
+  //   }
+  //   catch(e){
+  //     console.error(e);
+  //   }
+  // }
 
 };

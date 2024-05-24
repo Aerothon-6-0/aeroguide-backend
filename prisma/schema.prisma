@@ -61,6 +61,7 @@ model Flight {
   aircraftId         Int?
   userId             Int
   originCode         String
+  flightNumber       Int?
   destinationCode    String
   scheduledDeparture DateTime
   scheduledArrival   DateTime
