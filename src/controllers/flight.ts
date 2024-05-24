@@ -55,4 +55,17 @@ export const FlightController = {
       console.error(error);
     }
   },
+  async getFlightDetails(req: Request, res: Response){
+    try{
+
+      const data = await PrismaService.getAllScheduledFlights();
+
+      res.status(200).json(data);
+
+    }
+    catch(e){
+      console.error(e);
+    }
+  }
+
 };

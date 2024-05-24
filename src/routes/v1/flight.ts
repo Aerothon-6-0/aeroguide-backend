@@ -7,4 +7,6 @@ router.post('/', FlightController.createFlight);
 
 router.post('/:id', FlightController.getFlight);
 
+router.get('/',FlightController.getFlightDetails)
+
 export default router;
