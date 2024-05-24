@@ -104,7 +104,13 @@ export const PrismaService = {
   async countAirport() {
     return await prisma.airport.count();
   },
-  
+  async findAirportById(code: string){
+    return await prisma.airport.findFirst({
+      where:{
+        code
+      }
+    })
+  },
 
   async createFlight(
     airlineId: number,
