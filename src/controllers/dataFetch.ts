@@ -82,7 +82,7 @@ async findAndAddFlight(req: Request, res: Response) {
   
 
   const data = flights.filter((flight: any) => {
-    const departureTime = new Date(flight.departure.estimated);
+    const departureTime = new Date(flight.departure.scheduled);
     return departureTime > fiveMinutesFromNow && flight.flight.number !== null;
 })
 // console.log(data);
@@ -101,6 +101,21 @@ async findAndAddFlight(req: Request, res: Response) {
 
     flightData.push(flight);
   })
+
+  flightData.sort((flightA, flightB) => {
+    const startTimeA = new Date(flightA.startTime).getTime();
+    const startTimeB = new Date(flightB.startTime).getTime();
+    
+    // Compare start times
+    if (startTimeA < startTimeB) {
+      return -1;
+    }
+    if (startTimeA > startTimeB) {
+      return 1;
+    }
+    // If start times are equal, no need to change the order
+    return 0;
+  });
 
   
   // await Promise.all(
