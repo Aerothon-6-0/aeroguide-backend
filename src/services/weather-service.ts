@@ -41,15 +41,7 @@ export const WeatherService = {
     let params: any = {};
     params['latitude'] = [...lat];
     params['longitude'] = [...long];
-    params['hourly'] = [
-      'rain',
-      'visibility',
-      'weather_code',
-      'cloud_cover',
-      'visibility',
-      'wind_speed_180m',
-      'wind_direction_180m',
-    ];
+    params['hourly'] =  ["rain", "weather_code", "cloud_cover", "visibility", "wind_speed_180m", "wind_direction_180m"],
     params['forecast_days'] = 1;
 
     try {
@@ -79,12 +71,12 @@ export const WeatherService = {
               Number(hourly?.timeEnd()),
               hourly?.interval(),
             ).map((t) => new Date((t + utcOffsetSeconds) * 1000)),
-            rain: hourly?.variables(0)!.valuesArray()!,
-            visibility: hourly?.variables(1)!.valuesArray()!,
-            weatherCode: hourly?.variables(2)!.valuesArray()!,
-            cloudCover: hourly?.variables(3)!.valuesArray()!,
-            windSpeed180m: hourly?.variables(4)!.valuesArray()!,
-            windDirection180m: hourly?.variables(5)!.valuesArray()!,
+            rain: hourly.variables(0)!.valuesArray()!,
+            weatherCode: hourly.variables(1)!.valuesArray()!,
+            cloudCover: hourly.variables(2)!.valuesArray()!,
+            visibility: hourly.variables(3)!.valuesArray()!,
+            windSpeed180m: hourly.variables(4)!.valuesArray()!,
+            windDirection180m: hourly.variables(5)!.valuesArray()!,
           },
         };
 

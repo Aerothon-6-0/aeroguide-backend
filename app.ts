@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import routes from './src/routes';
 import { Server as SocketIOServer } from 'socket.io';
 import socketService from './src/services/socket-service'
+import { GetOptimalRouteJob } from './src/jobs/get-optimal-route';
 
 
 
@@ -43,9 +44,9 @@ setInterval(() => {
 }, 5000);
 
 
-
 server.listen(port, () => {
   console.log(`⚡️[socket]: Socket is running at http://localhost:${port}`);
 });
+GetOptimalRouteJob()
 
 

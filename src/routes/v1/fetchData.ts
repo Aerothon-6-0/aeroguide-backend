@@ -4,9 +4,9 @@ import flight from './flight';
 
 const router = Router();
 
-router.get('/airport',dataFetch.addAirportDetails );
-router.get('/getCount',dataFetch.getCountAirport)
-router.get('/airline',dataFetch.addAirportDetails)
-router.get('/flight',dataFetch.findAndAddFlight);
+router.get('/airport', dataFetch.addAirportDetails);
+router.get('/getCount', dataFetch.getCountAirport);
+router.get('/airline', dataFetch.addAirportDetails);
+router.get('/flight', dataFetch.findAndAddFlight);
 
 export default router;

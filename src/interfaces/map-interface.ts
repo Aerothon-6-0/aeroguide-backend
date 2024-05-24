@@ -26,6 +26,6 @@ export interface Bounds {
 }
 
 export interface Geography {
-  type: string,
+  type: string;
   coordinates: [number, number];
 }
