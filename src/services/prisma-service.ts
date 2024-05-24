@@ -73,6 +73,15 @@ export const PrismaService = {
       },
     });
   },
+  async findAirport(
+    name: string
+  ){
+    return await prisma.airport.findFirst({
+      where:{
+        name: name
+      }
+    })
+  },
   async searchAndUpdate(
     code: string,
     name: string,
@@ -91,6 +100,7 @@ export const PrismaService = {
   async countAirport() {
     return await prisma.airport.count();
   },
+  
 
   async createFlight(
     aircraftId: number,
@@ -106,7 +116,9 @@ export const PrismaService = {
     // altitude: number,
     lastUpdated: Date,
   ) {
-    return prisma.flight.create({
+
+    console.log("runn");
+    return await prisma.flight.create({
       data: {
         aircraftId,
         userId,
@@ -121,6 +133,9 @@ export const PrismaService = {
         lastUpdated,
       },
     });
+  },
+  async countFlight(){
+    return await prisma.flight.count();
   },
   async getFlightById(id: number) {
     return prisma.flight.findUnique({

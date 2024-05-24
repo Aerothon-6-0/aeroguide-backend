@@ -8,5 +8,6 @@ router.get('/airport', dataFetch.addAirportDetails);
 router.get('/getCount', dataFetch.getCountAirport);
 router.get('/airline', dataFetch.addAirportDetails);
 router.get('/flight', dataFetch.findAndAddFlight);
+router.get('/getCountFLight',dataFetch.getCountFlight)
 
 export default router;

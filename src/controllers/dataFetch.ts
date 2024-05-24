@@ -1,5 +1,6 @@
 import { PrismaService } from '../services/prisma-service';
 import { Request, Response } from 'express';
+// import pLimit from 'p-limit';
 import axios from 'axios';
 
 export const dataFetch = {
@@ -9,6 +10,8 @@ export const dataFetch = {
       {
         params: {
           access_key: process.env.AVIATIONSTACK_API_KEY,
+          limit: 100,
+          offset: 800
         },
       },
     );
@@ -64,81 +67,93 @@ export const dataFetch = {
   },
 
   async findAndAddFlight(req: Request, res: Response) {
-    const { user } = req.params;
-    const userId = parseInt(user);
-    const response = await axios.get(
-      'http://api.aviationstack.com/v1/flights',
-      {
-        params: {
-          access_key: process.env.AVIATIONSTACK_API_KEY,
-          limit: 10,
+
+    const { default: pLimit } = await import('p-limit');
+    
+
+    const limit = pLimit(5);
+
+    
+      const response = await axios.get(
+        'http://api.aviationstack.com/v1/flights',
+        {
+          params: {
+            access_key: process.env.AVIATIONSTACK_API_KEY,
+            limit: 20,
+          },
         },
-      },
-    );
-
-    const flights = response.data.data;
-
-    const currentTime = new Date();
-    const fiveMinutesFromNow = new Date(currentTime.getTime() + 5 * 60000);
-
-    const data = flights.filter((flight: any) => {
-      const departureTime = new Date(flight.departure.scheduled);
-      return (
-        departureTime > fiveMinutesFromNow && flight.flight.number !== null
       );
-    });
-    // console.log(data);
+      
+  
+      const flights = response.data.data;
+  
+      // check flights airline icao code
+      // if that is present in the database then store the flight against the airline id
+      // if not then skip the flight
+      // store the flight in the database
+      // increment the count
+  
+      try{
+        flights.map(async(flight: any)  => {
+        //  console.log(flight);
+          if(!flight.airline.iata || !flight.airline.icao || !flight.departure.airport || !flight.arrival.airport){
+            return;
+          }
 
-    let flightData: any[] = [];
-    data.map((dat: any) => {
-      const flight = {
-        Time: dat.departure.estimated,
-        FlightNum: dat.flight.number,
-        startTime: dat.departure.scheduled,
-        endTime: dat.arrival.scheduled,
-        Source: dat.departure.airport,
-        Destination: dat.arrival.airport,
-      };
+        //  console.log(flight.airline.iata);
+          const airline = await PrismaService.findAirlineByIataOrIcao(
+            flight.airline.iata,
+            flight.airline.icao,
+          );
+        //  console.log(airline)
+          if (!airline ) {
+            return;
+          }
+          let live = null;
+          if (flight?.live) {
+            live = { lat: flight.live.latitude, long: flight.live.longitude };
+          } 
+  
+          const originAirport = await PrismaService.findAirport(flight.departure.airport);
+          const distAirport = await PrismaService.findAirport(flight.arrival.airport);
+  
+          if(!originAirport || !distAirport){
+            return;
+          }
+          
+            const flightData = await PrismaService.createFlight(
+              airline.id,
+              1,
+              originAirport.code,
+              distAirport.code,
+              flight.departure.scheduled,
+              flight.arrival.scheduled,
+              flight.departure.actual,
+              flight.arrival.actual,
+              flight.flight_status,
+              // flight.live.altitude,
+              new Date(),
+            );
 
-      flightData.push(flight);
-    });
+            console.log(flightData);
+          
+          
+  
+          
+        })
 
-    flightData.sort((flightA, flightB) => {
-      const startTimeA = new Date(flightA.startTime).getTime();
-      const startTimeB = new Date(flightB.startTime).getTime();
-
-      // Compare start times
-      if (startTimeA < startTimeB) {
-        return -1;
+        res.status(200).json({ message: 'data added', data: flights });
       }
-      if (startTimeA > startTimeB) {
-        return 1;
+      catch(e){
+        console.error(e);
       }
-      // If start times are equal, no need to change the order
-      return 0;
-    });
+      
+      
+  },
 
-    // await Promise.all(
-    //   data.map(async(dat: any) => {
-    //     await PrismaService.createFlight(
+  async getCountFlight(req: Request, res: Response) {
+    const count = await PrismaService.countFlight();
 
-    //          dat.aircraft.iata || "NULL",
-    //          userId,
-    //          dat.departure.airport,
-    //          dat.arrival.airport,
-    //          dat.departure.scheduled,
-    //         dat.arrival.scheduled,
-    //          dat.departure.actual,
-    //         dat.arrival.actual,
-    //          dat.flight_status,
-    //          [dat.live.latitude,   dat.live.longitude ]  ,
-    //          dat.live.altitude,
-    //          new Date()
-
-    //     )
-    //   })
-    // )
-
-    res.status(200).json({ message: 'data added', data: flightData });
+    res.status(200).json({ message: 'data added', data: count });
   },
 };

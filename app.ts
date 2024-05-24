@@ -25,7 +25,7 @@ app.use(
   }),
 );
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 3000;
 
 socketService.initialize(server);
 
@@ -47,6 +47,6 @@ setInterval(() => {
 server.listen(port, () => {
   console.log(`⚡️[socket]: Socket is running at http://localhost:${port}`);
 });
-GetOptimalRouteJob()
+//  GetOptimalRouteJob()
 
 
