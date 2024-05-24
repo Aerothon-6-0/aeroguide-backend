@@ -5,34 +5,42 @@ import axios from 'axios';
 
 export const dataFetch = {
   async addAirportDetails(req: Request, res: Response) {
-    const response = await axios.get(
-      'http://api.aviationstack.com/v1/airports',
-      {
-        params: {
-          access_key: process.env.AVIATIONSTACK_API_KEY,
-          limit: 100,
-          offset: 800
+    try {
+      const response = await axios.get(
+        'http://api.aviationstack.com/v1/airports',
+        {
+          params: {
+            access_key: process.env.AVIATIONSTACK_API_KEY,
+            limit: 100,
+            offset:1200,
+
+          },
         },
-      },
-    );
+      );
+  
+      const airports = response.data.data;
 
-    const airports = response.data.data;
-    console.log(airports);
+  
+      
+        airports.map(async (airport: any) => {
 
-    await Promise.all(
-      airports.map(async (airport: any) => {
-        await PrismaService.searchAndUpdate(
-          airport.iata_code || 'NULL',
-          airport.airport_name || 'NULL',
-          airport.city_iata_code || 'NULL',
-          airport.country_name || 'NULL',
-          [parseFloat(airport.latitude), parseFloat(airport.longitude)],
-          0,
-        );
-      }),
-    );
+         const data =  await PrismaService.searchAndUpdate(
+            airport.iata_code || 'NULL',
+            airport.airport_name || 'NULL',
+            airport.city_iata_code || 'NULL',
+            airport.country_name || 'NULL',
+            [parseFloat(airport.latitude), parseFloat(airport.longitude)],
+            0,
+          );
+          console.log(data)
+        }),
 
-    res.status(200).json({ message: 'data added', data: airports });
+  
+      res.status(200).json({ message: 'data added', data: airports });
+    } catch (error:any) {
+      console.error(error)
+      res.status(500).json({ message: 'An error occurred', error: error.message });
+    }
   },
   async getCountAirport(req: Request, res: Response) {
     const count = await PrismaService.countAirport();
@@ -67,7 +75,7 @@ export const dataFetch = {
   },
 
   async  findAndAddFlight(req: Request, res: Response) {
-    console.log('here');
+
   
     try {
       const response = await axios.get(
@@ -75,7 +83,8 @@ export const dataFetch = {
         {
           params: {
             access_key: process.env.AVIATIONSTACK_API_KEY,
-            limit: 9,
+            limit: 20,
+            dep_iata:'AGR'
           },
         },
       );
@@ -88,30 +97,27 @@ export const dataFetch = {
         if (!flight.airline.iata || !flight.airline.icao || !flight.departure.airport || !flight.arrival.airport) {
           continue;
         }
-  
+
         const airline = await PrismaService.findAirlineByIataOrIcao(
           flight.airline.iata,
           flight.airline.icao,
         );
-  
+
         if (!airline) {
           continue;
         }
   
-        let live = null;
-        if (flight?.live) {
-          live = { lat: flight.live.latitude, long: flight.live.longitude };
-        }
+     
   
         const originAirport = await PrismaService.findAirport(flight.departure.airport);
         const distAirport = await PrismaService.findAirport(flight.arrival.airport);
-  
+
         if (!originAirport || !distAirport) {
           continue;
         }
-  console.log(originAirport, distAirport, airline)
 
-  console.log('Creating flight record for flight:', flight);
+
+
         const flightData =  PrismaService.createFlight(
           airline.id,
           1,
@@ -125,11 +131,11 @@ export const dataFetch = {
           new Date(),
         );
   
-        console.log('Flight record created:', flightData);
+
         processedFlights.push(flightData);
       }
   
-      res.status(200).json({ message: 'data added', data: processedFlights });
+      res.status(200).json({ message: 'data added', data: processedFlights,totalFlight:flights });
     } catch (e:any) {
       console.error(e);
       res.status(500).json({ message: 'An error occurred', error: e.message });

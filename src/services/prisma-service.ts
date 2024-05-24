@@ -90,11 +90,15 @@ export const PrismaService = {
     location: number[],
     elevation: number,
   ) {
+  try {
     return await prisma.airport.upsert({
       where: { code: code },
       update: { name: name },
       create: { code, name, city, country, location, elevation },
     });
+  } catch (error) {
+    console.error(error)
+  }
   },
 
   async countAirport() {
