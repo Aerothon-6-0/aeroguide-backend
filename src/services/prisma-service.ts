@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
+import { Geography } from '../interfaces/map-interface';
 
 const prisma = new PrismaClient();
 
@@ -67,9 +68,11 @@ export const PrismaService = {
     return await prisma.airport.count();
   },
 
-  async createFlight(data: Prisma.FlightCreateInput) {
+  async createFlight(aircraftId: number,userId: number,originCode: string,destinationCode: string,scheduledDeparture: Date,scheduledArrival: Date,actualDeparture: Date, actualArrival: Date,status          :string, currLocation :   number[] ,altitude : number,lastUpdated:Date) {
     return prisma.flight.create({
-      data,
+      data:{
+        aircraftId,userId,originCode,destinationCode,scheduledDeparture,scheduledArrival,actualDeparture, actualArrival,status, currLocation ,altitude,lastUpdated
+      }
     });
   }
   ,

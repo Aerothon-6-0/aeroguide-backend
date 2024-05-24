@@ -24,3 +24,8 @@ export interface Bounds {
     long: number;
   };
 }
+
+export interface Geography {
+  type: string,
+  coordinates: [number, number];
+}
