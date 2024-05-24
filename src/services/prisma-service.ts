@@ -55,6 +55,17 @@ export const PrismaService = {
       }
     })
   },
+  async searchAndUpdate(code: string,name: string, city : string, country: string,location : number[], elevation: number){
+    return await prisma.airport.upsert({
+      where: { code: code },
+    update: { name: name },
+    create: { code, name, city, country, location, elevation },
+    })
+  },
+
+  async countAirport(){
+    return await prisma.airport.count();
+  },
 
   async createFlight(data: Prisma.FlightCreateInput) {
     return prisma.flight.create({
