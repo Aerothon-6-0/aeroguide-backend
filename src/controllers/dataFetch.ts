@@ -66,90 +66,76 @@ export const dataFetch = {
     res.status(200).json({ message: 'data added', data: airlines });
   },
 
-  async findAndAddFlight(req: Request, res: Response) {
-
-    const { default: pLimit } = await import('p-limit');
-    
-
-    const limit = pLimit(5);
-
-    
+  async  findAndAddFlight(req: Request, res: Response) {
+    console.log('here');
+  
+    try {
       const response = await axios.get(
         'http://api.aviationstack.com/v1/flights',
         {
           params: {
             access_key: process.env.AVIATIONSTACK_API_KEY,
-            limit: 20,
+            limit: 9,
           },
         },
       );
-      
   
       const flights = response.data.data;
+      let processedFlights = [];
   
-      // check flights airline icao code
-      // if that is present in the database then store the flight against the airline id
-      // if not then skip the flight
-      // store the flight in the database
-      // increment the count
+      for (const flight of flights) {
+        // Skip flights with missing information
+        if (!flight.airline.iata || !flight.airline.icao || !flight.departure.airport || !flight.arrival.airport) {
+          continue;
+        }
   
-      try{
-        flights.map(async(flight: any)  => {
-        //  console.log(flight);
-          if(!flight.airline.iata || !flight.airline.icao || !flight.departure.airport || !flight.arrival.airport){
-            return;
-          }
+        const airline = await PrismaService.findAirlineByIataOrIcao(
+          flight.airline.iata,
+          flight.airline.icao,
+        );
+  
+        if (!airline) {
+          continue;
+        }
+  
+        let live = null;
+        if (flight?.live) {
+          live = { lat: flight.live.latitude, long: flight.live.longitude };
+        }
+  
+        const originAirport = await PrismaService.findAirport(flight.departure.airport);
+        const distAirport = await PrismaService.findAirport(flight.arrival.airport);
+  
+        if (!originAirport || !distAirport) {
+          continue;
+        }
+  console.log(originAirport, distAirport, airline)
 
-        //  console.log(flight.airline.iata);
-          const airline = await PrismaService.findAirlineByIataOrIcao(
-            flight.airline.iata,
-            flight.airline.icao,
-          );
-        //  console.log(airline)
-          if (!airline ) {
-            return;
-          }
-          let live = null;
-          if (flight?.live) {
-            live = { lat: flight.live.latitude, long: flight.live.longitude };
-          } 
+  console.log('Creating flight record for flight:', flight);
+        const flightData =  PrismaService.createFlight(
+          airline.id,
+          1,
+          originAirport.code,
+          distAirport.code,
+          flight.departure.scheduled,
+          flight.arrival.scheduled,
+          flight.departure.actual,
+          flight.arrival.actual,
+          flight.flight_status,
+          new Date(),
+        );
   
-          const originAirport = await PrismaService.findAirport(flight.departure.airport);
-          const distAirport = await PrismaService.findAirport(flight.arrival.airport);
-  
-          if(!originAirport || !distAirport){
-            return;
-          }
-          
-            const flightData = await PrismaService.createFlight(
-              airline.id,
-              1,
-              originAirport.code,
-              distAirport.code,
-              flight.departure.scheduled,
-              flight.arrival.scheduled,
-              flight.departure.actual,
-              flight.arrival.actual,
-              flight.flight_status,
-              // flight.live.altitude,
-              new Date(),
-            );
-
-            console.log(flightData);
-          
-          
-  
-          
-        })
-
-        res.status(200).json({ message: 'data added', data: flights });
+        console.log('Flight record created:', flightData);
+        processedFlights.push(flightData);
       }
-      catch(e){
-        console.error(e);
-      }
-      
-      
+  
+      res.status(200).json({ message: 'data added', data: processedFlights });
+    } catch (e:any) {
+      console.error(e);
+      res.status(500).json({ message: 'An error occurred', error: e.message });
+    }
   },
+  
 
   async getCountFlight(req: Request, res: Response) {
     const count = await PrismaService.countFlight();

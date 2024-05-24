@@ -19,7 +19,7 @@ export const FlightController = {
         res.status(400).json({ message: 'Flight id is required' });
       }
 
-      const flight = await PrismaService.getFlightById(parseInt(flightId));
+      // const flight = await PrismaService.getFlightById(parseInt(flightId));
 
       const {
         bounds,
@@ -41,14 +41,16 @@ export const FlightController = {
 
       const modifiedMatrix = MapMatrixTransformer(
         weatherInfo,
-        flight?.origin.location,
-        flight?.destination.location,
+        source,
+        destination,
+        // flight?.origin.location,
+        // flight?.destination.location,
       );
 
-      const optimalRoute: any =
-        await AeroguideService.getOptimalRoute(modifiedMatrix);
+      // const optimalRoute: any =
+      //   await AeroguideService.getOptimalRoute(modifiedMatrix);
 
-      res.status(200).json(optimalRoute);
+      res.status(200).json(modifiedMatrix);
     } catch (error) {
       console.error(error);
     }

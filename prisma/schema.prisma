@@ -28,7 +28,8 @@ model Airline {
   country   String
   IATA_code String
   ICAO_code String
-  aircrafts Aircraft[] // Corrected naming convention
+  aircrafts Aircraft[]
+  flights   Flight[] // Corrected naming convention
 }
 
 model Aircraft {
@@ -57,7 +58,7 @@ model Airport {
 
 model Flight {
   id                 Int                                     @id @default(autoincrement())
-  aircraftId         Int
+  aircraftId         Int?
   userId             Int
   originCode         String
   destinationCode    String
@@ -73,12 +74,14 @@ model Flight {
   riskAssessment     RiskAssessment?
   lastUpdated        DateTime
 
-  aircraft         Aircraft           @relation(fields: [aircraftId], references: [id])
+  aircraft         Aircraft?          @relation(fields: [aircraftId], references: [id])
   origin           Airport            @relation("FlightsOrigin", fields: [originCode], references: [code])
   destination      Airport            @relation("FlightsDestination", fields: [destinationCode], references: [code])
   account          Account            @relation(fields: [userId], references: [id])
   notifications    Notification[]
   WeatherCondition WeatherCondition[]
+  Airline          Airline?           @relation(fields: [airlineId], references: [id])
+  airlineId        Int?
 }
 
 model WeatherCondition {

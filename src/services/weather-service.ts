@@ -41,8 +41,15 @@ export const WeatherService = {
     let params: any = {};
     params['latitude'] = [...lat];
     params['longitude'] = [...long];
-    params['hourly'] =  ["rain", "weather_code", "cloud_cover", "visibility", "wind_speed_180m", "wind_direction_180m"],
-    params['forecast_days'] = 1;
+    (params['hourly'] = [
+      'rain',
+      'weather_code',
+      'cloud_cover',
+      'visibility',
+      'wind_speed_180m',
+      'wind_direction_180m',
+    ]),
+      (params['forecast_days'] = 1);
 
     try {
       const responses: any = await fetchWeatherApi(weather_url, params);
@@ -92,15 +99,21 @@ export const WeatherService = {
           }),
         );
 
-        return [
-          {
-            lat,
-            long,
-            formattedHourlyData,
-          },
-        ];
+        return { lat, long, formattedHourlyData };
       });
-      return [...weatherDataArray];
+      let weatherMatrix: any[] = [];
+      let prevLat = weatherDataArray[0].lat;
+      let row: any[] = [];
+      weatherDataArray.forEach((weatherData: any) => {
+        if (weatherData.lat !== prevLat ) {
+          weatherMatrix.push(row);
+          row = [weatherData];
+          prevLat = weatherData.lat;
+        } else {
+          row.push(weatherData);
+        }
+      });
+      return weatherMatrix;
     } catch (error) {
       console.error(error);
       // throw new Error(`${error}`);

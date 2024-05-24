@@ -103,7 +103,7 @@ export const PrismaService = {
   
 
   async createFlight(
-    aircraftId: number,
+    airlineId: number,
     userId: number,
     originCode: string,
     destinationCode: string,
@@ -116,27 +116,35 @@ export const PrismaService = {
     // altitude: number,
     lastUpdated: Date,
   ) {
-
-    console.log("runn");
-    return await prisma.flight.create({
-      data: {
-        aircraftId,
-        userId,
-        originCode,
-        destinationCode,
-        scheduledDeparture,
-        scheduledArrival,
-        actualDeparture,
-        actualArrival,
-        status,
-        // altitude,
-        lastUpdated,
-      },
-    });
+try {
+  
+  console.log("runn");
+  return await prisma.flight.create({
+    data: {
+      airlineId,
+      userId,
+      originCode,
+      destinationCode,
+      scheduledDeparture,
+      scheduledArrival,
+      actualDeparture,
+      actualArrival,
+      status,
+      // altitude,
+      lastUpdated,
+    },
+  });
+} catch (error) {
+  console.error(error)
+  throw new Error("Error in creating flight")
+}
   },
+
+
   async countFlight(){
     return await prisma.flight.count();
   },
+
   async getFlightById(id: number) {
     return prisma.flight.findUnique({
       where: { id },
