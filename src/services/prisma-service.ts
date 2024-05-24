@@ -18,43 +18,60 @@ export const PrismaService = {
       },
     });
   },
-    async createAirline(name: string,country: string,IATA_code: string,ICAO_code: string){
+  async createAirline(
+    name: string,
+    country: string,
+    IATA_code: string,
+    ICAO_code: string,
+  ) {
     return await prisma.airline.create({
-      data:{
+      data: {
         name,
         country,
         IATA_code,
-        ICAO_code
-      }
+        ICAO_code,
+      },
+    });
+  },
 
-    })
-  }, 
-
-  async createAircraft(model:string,manufacturer:string,capacity: number,airlineId: number,healthMetrics: Prisma.InputJsonValue,lastMaintenance: Date){
+  async createAircraft(
+    model: string,
+    manufacturer: string,
+    capacity: number,
+    airlineId: number,
+    healthMetrics: Prisma.InputJsonValue,
+    lastMaintenance: Date,
+  ) {
     return await prisma.aircraft.create({
-      data:{
+      data: {
         model,
         manufacturer,
         capacity,
         airlineId,
         healthMetrics,
-        lastMaintenance
-      }
-    })
+        lastMaintenance,
+      },
+    });
   },
 
-  async createAirport(code: string,name: string, city : string, country: string,location : number[], elevation: number){
+  async createAirport(
+    code: string,
+    name: string,
+    city: string,
+    country: string,
+    location: number[],
+    elevation: number,
+  ) {
     return await prisma.airport.create({
-      data:{
+      data: {
         code,
         name,
         city,
         country,
         location,
-        elevation
-
-      }
-    })
+        elevation,
+      },
+    });
   },
   async searchAndUpdate(code: string,name: string, city : string, country: string,location : number[], elevation: number){
     return await prisma.airport.upsert({
@@ -74,16 +91,14 @@ export const PrismaService = {
         aircraftId,userId,originCode,destinationCode,scheduledDeparture,scheduledArrival,actualDeparture, actualArrival,status, currLocation ,altitude,lastUpdated
       }
     });
-  }
-  ,
-
+  },
   async getFlightById(id: number) {
     return prisma.flight.findUnique({
       where: { id },
-      include:{
-       origin:true,
-        destination:true,
-      }
+      include: {
+        origin: true,
+        destination: true,
+      },
     });
   },
 
@@ -120,7 +135,10 @@ export const PrismaService = {
     return prisma.weatherCondition.findMany();
   },
 
-  async updateWeatherCondition(id: number, data: Prisma.WeatherConditionUpdateInput) {
+  async updateWeatherCondition(
+    id: number,
+    data: Prisma.WeatherConditionUpdateInput,
+  ) {
     return prisma.weatherCondition.update({
       where: { id },
       data,
@@ -133,21 +151,20 @@ export const PrismaService = {
     });
   },
 
-
   // async createFlight(userId: number) {
   //   return await prisma.flight.;
   // },
 
-  async getAllScheduledFlights(){
+  async getAllScheduledFlights() {
     const currentDate = new Date();
     const fiveMinutesLater = new Date(currentDate.getTime() + 5 * 60 * 1000);
     return await prisma.flight.findMany({
-      where :{
-        scheduledDeparture :{
-          gte:currentDate,
-          lte:fiveMinutesLater
+      where: {
+        scheduledDeparture: {
+          gte: currentDate,
+          lte: fiveMinutesLater,
         },
-      }
-    })
-  }
+      },
+    });
+  },
 };
