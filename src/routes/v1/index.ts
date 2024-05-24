@@ -4,6 +4,8 @@ import accounts from './accounts';
 import flightRoute from './flight';
 import weather from './weather';
 import data from './fetchData';
+import airport from './airport';
+
 
 const router = Router();
 
@@ -15,5 +17,7 @@ router.use('/accounts', accounts);
 router.use('/flight', flightRoute);
 router.use('/weather', weather);
 router.use('/fetchData', data);
+router.use('/airport',airport)
+
 
 export default router;
