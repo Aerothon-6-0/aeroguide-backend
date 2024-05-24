@@ -144,8 +144,7 @@ export const PrismaService = {
     return await prisma.flight.findMany({
       where :{
         scheduledDeparture :{
-          gte:currentDate,
-          lte:fiveMinutesLater
+          gte:fiveMinutesLater,
         },
       }
     })
