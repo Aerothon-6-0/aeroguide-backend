@@ -221,6 +221,11 @@ try {
           gte: fiveMinutesLater,
         },
       },
+      include:{
+        origin: true,
+        destination: true,
+        Airline: true
+      }
     });
   },
 
