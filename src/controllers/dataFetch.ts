@@ -83,14 +83,17 @@ async findAndAddFlight(req: Request, res: Response) {
 
   const data = flights.filter((flight: any) => {
     const departureTime = new Date(flight.departure.estimated);
-    return departureTime > fiveMinutesFromNow;
+    return departureTime > fiveMinutesFromNow && flight.flight.number !== null;
 })
+console.log(data);
 
   let flightData: any[] = [];
   data.map((dat: any) => {
     const flight = {
       Time: dat.departure.estimated,
       FlightNum: dat.flight.number,
+      startTime: dat.departure.scheduled,
+      endTime: dat.arrival.scheduled,
       Source: dat.departure.airport,
       Destination: dat.arrival.airport
   
