@@ -73,14 +73,12 @@ export const PrismaService = {
       },
     });
   },
-  async findAirport(
-    name: string
-  ){
+  async findAirport(name: string) {
     return await prisma.airport.findFirst({
-      where:{
-        name: name
-      }
-    })
+      where: {
+        name: name,
+      },
+    });
   },
   async searchAndUpdate(
     code: string,
@@ -90,26 +88,26 @@ export const PrismaService = {
     location: number[],
     elevation: number,
   ) {
-  try {
-    return await prisma.airport.upsert({
-      where: { code: code },
-      update: { name: name },
-      create: { code, name, city, country, location, elevation },
-    });
-  } catch (error) {
-    console.error(error)
-  }
+    try {
+      return await prisma.airport.upsert({
+        where: { code: code },
+        update: { name: name },
+        create: { code, name, city, country, location, elevation },
+      });
+    } catch (error) {
+      console.error(error);
+    }
   },
 
   async countAirport() {
     return await prisma.airport.count();
   },
-  async findAirportById(code: string){
+  async findAirportById(code: string) {
     return await prisma.airport.findFirst({
-      where:{
-        code
-      }
-    })
+      where: {
+        code,
+      },
+    });
   },
 
   async createFlight(
@@ -126,32 +124,30 @@ export const PrismaService = {
     // altitude: number,
     lastUpdated: Date,
   ) {
-try {
-  
-  console.log("runn");
-  return await prisma.flight.create({
-    data: {
-      airlineId,
-      userId,
-      originCode,
-      destinationCode,
-      scheduledDeparture,
-      scheduledArrival,
-      actualDeparture,
-      actualArrival,
-      status,
-      // altitude,
-      lastUpdated,
-    },
-  });
-} catch (error) {
-  console.error(error)
-  throw new Error("Error in creating flight")
-}
+    try {
+      console.log('runn');
+      return await prisma.flight.create({
+        data: {
+          airlineId,
+          userId,
+          originCode,
+          destinationCode,
+          scheduledDeparture,
+          scheduledArrival,
+          actualDeparture,
+          actualArrival,
+          status,
+          // altitude,
+          lastUpdated,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      throw new Error('Error in creating flight');
+    }
   },
 
-
-  async countFlight(){
+  async countFlight() {
     return await prisma.flight.count();
   },
 
@@ -175,12 +171,12 @@ try {
       data,
     });
   },
-  async getRiskAssessment(flightId: number){
+  async getRiskAssessment(flightId: number) {
     return await prisma.riskAssessment.findFirst({
-      where:{
-        flightId: flightId
-      }
-    })
+      where: {
+        flightId: flightId,
+      },
+    });
   },
 
   async deleteFlight(id: number) {
@@ -234,11 +230,11 @@ try {
           gte: fiveMinutesLater,
         },
       },
-      include:{
+      include: {
         origin: true,
         destination: true,
-        Airline: true
-      }
+        Airline: true,
+      },
     });
   },
 
@@ -249,9 +245,18 @@ try {
       },
     });
   },
-async addRiskAssessemnt(flightId: number, timestamp: Date, weatherConditionId: number, electronicFailure: boolean, visibilityIssue: boolean, otherRisks: any, riskLevel: string, suggestedAction: string){
+  async addRiskAssessemnt(
+    flightId: number,
+    timestamp: Date,
+    weatherConditionId: number,
+    electronicFailure: boolean,
+    visibilityIssue: boolean,
+    otherRisks: any,
+    riskLevel: string,
+    suggestedAction: string,
+  ) {
     return await prisma.riskAssessment.create({
-      data:{
+      data: {
         flightId,
         timestamp,
         weatherConditionId,
@@ -259,14 +264,24 @@ async addRiskAssessemnt(flightId: number, timestamp: Date, weatherConditionId: n
         visibilityIssue,
         otherRisks,
         riskLevel,
-        suggestedAction
-      }
-    })
+        suggestedAction,
+      },
+    });
   },
 
-  async addWeather(timestamp: Date,location: number[],temperature: number,windSpeed: number,windDirection: number, humidity: number,visibility: number,condition: string,flightId: number){
+  async addWeather(
+    timestamp: Date,
+    location: number[],
+    temperature: number,
+    windSpeed: number,
+    windDirection: number,
+    humidity: number,
+    visibility: number,
+    condition: string,
+    flightId: number,
+  ) {
     return await prisma.weatherCondition.create({
-      data:{
+      data: {
         timestamp,
         location,
         temperature,
@@ -275,12 +290,8 @@ async addRiskAssessemnt(flightId: number, timestamp: Date, weatherConditionId: n
         humidity,
         visibility,
         condition,
-        flightId
-      }
-    })
-  }
-
+        flightId,
+      },
+    });
+  },
 };
-
-  
-

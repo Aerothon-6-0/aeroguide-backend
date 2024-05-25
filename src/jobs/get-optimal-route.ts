@@ -89,26 +89,35 @@ async function fetchAndStorFlight() {
     await Promise.all(
       flights.map(async (flight: any) => {
         console.log(flight);
-        if(!flight.airline.iata || !flight.airline.icao || !flight.departure.airport || !flight.arrival.airport){
+        if (
+          !flight.airline.iata ||
+          !flight.airline.icao ||
+          !flight.departure.airport ||
+          !flight.arrival.airport
+        ) {
           return;
         }
         const airline = await PrismaService.findAirlineByIataOrIcao(
           flight.airline.iata,
           flight.airline.icao,
         );
-        console.log(airline)
-        if (!airline ) {
+        console.log(airline);
+        if (!airline) {
           return;
         }
         let live = null;
         if (flight?.live) {
           live = { lat: flight.live.latitude, long: flight.live.longitude };
-        } 
+        }
 
-        const originAirport = await PrismaService.findAirport(flight.departure.airport);
-        const distAirport = await PrismaService.findAirport(flight.arrival.airport);
+        const originAirport = await PrismaService.findAirport(
+          flight.departure.airport,
+        );
+        const distAirport = await PrismaService.findAirport(
+          flight.arrival.airport,
+        );
 
-        if(!originAirport || !distAirport){
+        if (!originAirport || !distAirport) {
           return;
         }
 

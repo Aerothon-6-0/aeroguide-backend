@@ -36,3 +36,50 @@ export const generateMatrix = (bounds: Bounds, distance: number) => {
 
   return latLongMatrix;
 };
+
+export const getLatAndLangFromMatrix = (matrix: any) => {
+  console.log(matrix)
+  const lat: number[] = [];
+  const long: number[] = [];
+  matrix.forEach((row: any) => {
+    row.forEach((node: any) => {
+      lat.push(node.lat);
+      long.push(node.long);
+    });
+  });
+  return { lat, long };
+};
+
+export const getLatAndLangFromMatrix2= (matrix: any[]) => {
+
+    // Check if matrix is an array
+    if (!Array.isArray(matrix)) {
+      throw new Error('matrix is not an array');
+    }
+  
+    const lat: number[] = [];
+    const long: number[] = [];
+  
+    // Iterate over each row in the matrix
+    matrix.forEach((row: any, rowIndex: number) => {
+      // Check if the current row is an array
+      if (!Array.isArray(row)) {
+        throw new Error(`Row at index ${rowIndex} is not an array`);
+      }
+  
+      // Iterate over each node in the row
+      row.forEach((node: any, nodeIndex: number) => {
+        // Check if the node contains lat and long properties
+        if (node && typeof node.lat === 'number' && typeof node.long === 'number') {
+          lat.push(node.lat);
+          long.push(node.long);
+        } else {
+          throw new Error(`Node at row ${rowIndex}, index ${nodeIndex} does not contain valid lat and long properties`);
+        }
+      });
+
+    });
+    return { lat, long };
+  };
+  
+

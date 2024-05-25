@@ -3,47 +3,52 @@ import {
   changeInLatitude,
   changeInLongitude,
   generateMatrix,
+  getLatAndLangFromMatrix,
 } from '../utils/map-utils';
 import { Bounds } from '../interfaces/map-interface';
-
 
 const weather_url = 'https://api.open-meteo.com/v1/forecast';
 
 export const WeatherService = {
   async getWeatherByLatLong(lat: number, long: number) {
-   try {
-    console.log(lat,long)
-    let params: any = {};
-    params['latitude'] = lat;
-    params['longitude'] = long;
-    params['current'] =["temperature_2m", "rain", "weather_code", "cloud_cover", "wind_speed_10m", "wind_direction_10m"]
+    try {
+      console.log(lat, long);
+      let params: any = {};
+      params['latitude'] = lat;
+      params['longitude'] = long;
+      params['current'] = [
+        'temperature_2m',
+        'rain',
+        'weather_code',
+        'cloud_cover',
+        'wind_speed_10m',
+        'wind_direction_10m',
+      ];
 
+      const responses: any = await fetchWeatherApi(weather_url, params);
 
-    const responses: any = await fetchWeatherApi(weather_url, params);
+      if (!responses) {
+        throw new Error('No weather data found');
+      }
 
-    if (!responses) {
-      throw new Error('No weather data found');
+      const response = responses[0];
+      const current = response.current()!;
+      const weatherData = {
+        current: {
+          temperature2m: current.variables(0)!.value(),
+          rain: current.variables(1)!.value(),
+          weatherCode: current.variables(2)!.value(),
+          cloudCover: current.variables(3)!.value(),
+          windSpeed10m: current.variables(4)!.value(),
+          windDirection10m: current.variables(5)!.value(),
+        },
+      };
+      console.log(weatherData);
+      return weatherData;
+    } catch (error) {
+      console.error(error);
+      throw new Error(`${error}`);
     }
-
-    const response = responses[0]
-    const current = response.current()!;
-   const weatherData ={
-    current: {
-      temperature2m: current.variables(0)!.value(),
-      rain: current.variables(1)!.value(),
-      weatherCode: current.variables(2)!.value(),
-      cloudCover: current.variables(3)!.value(),
-      windSpeed10m: current.variables(4)!.value(),
-      windDirection10m: current.variables(5)!.value(),
-    },
-   }
-   console.log(weatherData)
-    return weatherData;
-
-   } catch (error) {
-console.error(error)    
-throw new Error(`${error}`);
-   }
   },
 
   async getBulkWeatherByLatLong(lat: number[], long: number[]) {
@@ -119,7 +124,7 @@ throw new Error(`${error}`);
       let prevLat = weatherDataArray[0].lat;
       let row: any[] = [];
       weatherDataArray.forEach((weatherData: any) => {
-        if (weatherData.lat !== prevLat ) {
+        if (weatherData.lat !== prevLat) {
           weatherMatrix.push(row);
           row = [weatherData];
           prevLat = weatherData.lat;
@@ -146,14 +151,8 @@ throw new Error(`${error}`);
 
     const latlongMatrix = generateMatrix(bounds, distance);
 
-    const lat: number[] = [];
-    const long: number[] = [];
-    latlongMatrix.forEach((row) => {
-      row.forEach((node) => {
-        lat.push(node.lat);
-        long.push(node.long);
-      });
-    });
+    const { lat, long } = getLatAndLangFromMatrix(latlongMatrix);
+
     return { lat, long };
   },
 };

@@ -4,6 +4,6 @@ import { AirportController } from '../../controllers/airport';
 
 const router = Router();
 
-router.get('/:code',AirportController.getAirportDetails)
+router.get('/:code', AirportController.getAirportDetails);
 
 export default router;
