@@ -250,19 +250,28 @@ try {
     });
   },
 async addRiskAssessemnt(flightId: number, timestamp: Date, weatherConditionId: number, electronicFailure: boolean, visibilityIssue: boolean, otherRisks: any, riskLevel: string, suggestedAction: string){
-    return await prisma.riskAssessment.create({
-      data:{
-        flightId,
+    return await prisma.riskAssessment.upsert({
+      where: { flightId: flightId },
+      update: { flightId,
         timestamp,
         weatherConditionId,
         electronicFailure,
         visibilityIssue,
         otherRisks,
         riskLevel,
-        suggestedAction
-      }
+        suggestedAction },
+      create: { flightId,
+        timestamp,
+        weatherConditionId,
+        electronicFailure,
+        visibilityIssue,
+        otherRisks,
+        riskLevel,
+        suggestedAction },
     })
-  },
+      
+    }
+  ,
 
   async addWeather(timestamp: Date,location: number[],temperature: number,windSpeed: number,windDirection: number, humidity: number,visibility: number,condition: string,flightId: number){
     return await prisma.weatherCondition.create({
@@ -280,7 +289,7 @@ async addRiskAssessemnt(flightId: number, timestamp: Date, weatherConditionId: n
     })
   }
 
-};
+}
 
   
 
