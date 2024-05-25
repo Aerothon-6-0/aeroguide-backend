@@ -23,12 +23,9 @@ export const FlightController = {
 
       const {
         bounds,
-        source,
-        destination,
       }: {
         bounds: Bounds;
-        source: { lat: number; long: number };
-        destination: { lat: number; long: number };
+
       } = req.body;
 
       const { lat, long }: { lat: number[]; long: number[] } =
@@ -39,6 +36,7 @@ export const FlightController = {
         long,
       );
 
+
       const modifiedMatrix = MapMatrixTransformer(
         weatherInfo,
         // source,
@@ -47,14 +45,15 @@ export const FlightController = {
         flight?.destination.location,
       );
 
+      // console.log(modifiedMatrix)
       const optimalRoute: any =
         await AeroguideService.getOptimalRoute(modifiedMatrix);
 
 
-
       res.status(200).json(optimalRoute);
-    } catch (error) {
-      console.error(error);
+    } catch (error:any) {
+      console.error(error.message)
+res.status(400).json({message:error})
     }
   },
   async getFlightDetails(req: Request, res: Response){
