@@ -242,4 +242,38 @@ try {
       },
     });
   },
+async addRiskAssessemnt(flightId: number, timestamp: Date, weatherConditionId: number, electronicFailure: boolean, visibilityIssue: boolean, otherRisks: any, riskLevel: string, suggestedAction: string){
+    return await prisma.riskAssessment.create({
+      data:{
+        flightId,
+        timestamp,
+        weatherConditionId,
+        electronicFailure,
+        visibilityIssue,
+        otherRisks,
+        riskLevel,
+        suggestedAction
+      }
+    })
+  },
+
+  async addWeather(timestamp: Date,location: number[],temperature: number,windSpeed: number,windDirection: number, humidity: number,visibility: number,condition: string,flightId: number){
+    return await prisma.weatherCondition.create({
+      data:{
+        timestamp,
+        location,
+        temperature,
+        windSpeed,
+        windDirection,
+        humidity,
+        visibility,
+        condition,
+        flightId
+      }
+    })
+  }
+
+};
+
+  
 };
