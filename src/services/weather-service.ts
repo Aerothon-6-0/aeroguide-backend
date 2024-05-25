@@ -142,7 +142,7 @@ throw new Error(`${error}`);
     // the distance between any node has to be 5km
     // each node should have a lat and long
 
-    const distance = 75; // 60km
+    const distance = 200; // 60km
 
     const latlongMatrix = generateMatrix(bounds, distance);
 

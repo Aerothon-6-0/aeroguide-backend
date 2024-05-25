@@ -7,7 +7,7 @@ router.post('/', FlightController.createFlight);
 
 router.post('/:id', FlightController.getFlightRoute);
 
-router.get("/:id", FlightController.getFlightDetails)
+router.get("/", FlightController.getFlightDetails)
 
 router.get('/:id/info',FlightController.getFlightById)
 

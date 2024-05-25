@@ -19,14 +19,14 @@ export const generateMatrix = (bounds: Bounds, distance: number) => {
 
   const latLongMatrix = [];
   // Iterate from south to north
-  for (let lat = south_west.lat; lat <= north_west.lat; lat += latStep) {
+  for (let lat = north_west.lat; lat <= south_west.lat; lat += latStep) {
     const longStep = changeInLongitude(distance, lat); // Recalculate longStep for the current latitude
 
     const row = [];
     // Iterate from west to east
     for (
-      let long = south_west.long;
-      long <= south_east.long;
+      let long = north_west.long;
+      long <= north_east.long;
       long += longStep
     ) {
       row.push({ lat, long });
