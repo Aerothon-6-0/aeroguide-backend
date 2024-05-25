@@ -175,6 +175,13 @@ try {
       data,
     });
   },
+  async getRiskAssessment(flightId: number){
+    return await prisma.riskAssessment.findFirst({
+      where:{
+        flightId: flightId
+      }
+    })
+  },
 
   async deleteFlight(id: number) {
     return prisma.flight.delete({

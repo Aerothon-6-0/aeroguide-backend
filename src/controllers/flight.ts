@@ -75,14 +75,14 @@ res.status(400).json({message:error})
         res.status(400).json({ message: 'Flight id is required' });
       }
       const flight = await PrismaService.getFlightById(parseInt(flightId));
-
+      const riskAssessment = await PrismaService.getRiskAssessment(parseInt(flightId));
       if(!flight?.origin){
         return res.status(404).json({message: "Flight info not found"});
       }
 console.log(flight?.origin.location[0],flight?.origin.location[1])
       const weatherInfo = await WeatherService.getWeatherByLatLong(flight?.origin.location[0],flight?.origin.location[1]);
       console.log(weatherInfo)
-      res.status(200).json({flight,weatherInfo});
+      res.status(200).json({flight,weatherInfo,riskAssessment});
     } catch (error) {
       
     }

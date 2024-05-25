@@ -16,7 +16,7 @@ export const WeatherService = {
     let params: any = {};
     params['latitude'] = lat;
     params['longitude'] = long;
-    params['current'] =["temperature_2m", "rain", "weather_code", "cloud_cover", "wind_speed_10m", "wind_direction_10m", "temperature_180"]
+    params['current'] =["temperature_2m", "rain", "weather_code", "cloud_cover", "wind_speed_10m", "wind_direction_10m"]
 
 
     const responses: any = await fetchWeatherApi(weather_url, params);
